@@ -22,6 +22,11 @@ Click Add project and choose the the folder "Training Grounds" that you cloned
 <br/>
 ![image](https://github.com/user-attachments/assets/2ceb9973-4de0-4020-9b43-efe025c71910)
 
+## Prefabs (Configured Objects and is in the Current Scene)
+
+![image](https://github.com/user-attachments/assets/1a57aec1-5f46-4f0d-ba28-7e7f2d8e5dcf)
+
+
 ## Four OOP Principles
 - [x] **Encapsulation**
 - [x] **Inheritance**
