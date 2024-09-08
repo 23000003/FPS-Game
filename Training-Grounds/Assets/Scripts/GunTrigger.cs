@@ -1,58 +1,113 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
 public class GunTrigger : MonoBehaviour
 {
-    // Reference Object
+
+    //Empty totalbullets functionality soon 
+
+    // Reference Objects
     private Animator animations;
-    public Transform bulletSpawn;
-    public GameObject bulletPrefab;
-    public ParticleSystem flash;
+    [SerializeField] private Transform bulletSpawn;
+    [SerializeField] private GameObject bulletPrefab;
+    [SerializeField] private ParticleSystem flash;
 
-    public Vector3 moveDirection = Vector3.zero; 
-    public float bulletSpeed = 10f;
-    public float fireRate = 0.1f; 
+    [SerializeField] private AudioClip fireClip;
+    [SerializeField] private AudioClip reloadClip;
+    [SerializeField] private AudioSource fireSource;
+    [SerializeField] private AudioSource reloadSource;
+   
+    // will use a Setter make it private
+    private float bulletSpeed;
+    private float fireRate; 
+    private float reloadDuration;
+    private float reloadTimeRemaining;
+    private int bullets;
+    private int totalbullets;
 
-    public float reloadDuration = 1.0f;
+    //This is not a constructor but a function setter :))
+    protected void GunSettings(float bulletSpeed, float fireRate, float reloadDuration,
+                            float reloadTimeRemaining, int bullets, int totalbullets)
+    {
+        this.bulletSpeed = bulletSpeed;
+        this.fireRate = fireRate;
+        this.reloadDuration = reloadDuration;
+        this.reloadTimeRemaining = reloadTimeRemaining;
+        this.bullets = bullets;
+        this.totalbullets = totalbullets;
+        tempBullets = bullets;
+    }
+
     private float nextFireTime = 0f;
-    private float reloadTimeRemaining = 0.0f;
+    private bool Reload = false;
     private bool isReloading = false;
+    private int tempBullets;
 
-    private void Start()
+    protected virtual void Start()
     {
         // Access to the animations controller
         animations = gameObject.GetComponent<Animator>();
         animations.SetInteger("Movement", 0);
+        InstantiateAudio(fireClip, reloadClip);
     }
 
-    void Update()
+    protected virtual void Update()
     {
         HandleShooting();
         HandleReloading();
         GunPerspectiveMovements();
     }
 
+    private void InstantiateAudio(AudioClip Fireclip, AudioClip reloadClip)
+    {
+        fireSource = gameObject.AddComponent<AudioSource>();
+        fireSource.clip = Fireclip;
+
+        reloadSource = gameObject.AddComponent<AudioSource>();
+        reloadSource.clip = reloadClip;
+    }
+
     private void HandleShooting()
     {
-        // if left click is on bold by user
-        if (Input.GetMouseButton(0)) 
+        // if left click is on hold by user
+        if (Input.GetMouseButton(0) && !Input.GetKey(KeyCode.LeftShift)) 
         {
             // if enough time has passed to fire again
-            if (Time.time > nextFireTime)
+            if (Time.time > nextFireTime && bullets > 0)
             {
                 // Instantiate the bullet (Fire)
                 var bullet = Instantiate(bulletPrefab, bulletSpawn.position, bulletSpawn.rotation);
                 bullet.GetComponent<Rigidbody>().velocity = bulletSpawn.forward * bulletSpeed;
+                
+                // Gun Fire Sound Effects
+                fireSource.PlayOneShot(fireClip);
 
                 // Particle Effect
                 flash.Play();
 
                 // Set the time for the next shot
                 nextFireTime = Time.time + fireRate;
+    
+                if (Input.GetMouseButtonDown(0)) // 1 tap
+                {
+                    animations.SetInteger("Fire", 1);
+                }
+                else
+                {
+                    animations.SetInteger("Fire", 2);
+                }
 
-                animations.SetInteger("Fire", 2);
                 animations.SetInteger("Movement", -1);
+
+                --bullets;
+
+            }
+            else if(bullets <= 0)
+            {
+                Reload = true;
+                print("TRUE");
             }
         }
         else
@@ -63,15 +118,16 @@ public class GunTrigger : MonoBehaviour
 
     private void HandleReloading()
     {
-        bool Reload = Input.GetKey(KeyCode.R);
-
-        if (Reload)
+        bool ManualReload = Input.GetKey(KeyCode.R);
+        if (Reload || (ManualReload && bullets != 30))
         {
             if (!isReloading)
             {
                 // Start the reload process
                 isReloading = true;
                 reloadTimeRemaining = reloadDuration;
+                Console.WriteLine("Reloading");
+                reloadSource.PlayOneShot(reloadClip);
                 animations.SetInteger("Reload", 0);
             }
         }
@@ -79,12 +135,15 @@ public class GunTrigger : MonoBehaviour
         if (isReloading)
         {
             reloadTimeRemaining -= Time.deltaTime;
-            print(reloadTimeRemaining);
-            if (reloadTimeRemaining <= 0.0f)
+           
+            if (reloadTimeRemaining <= -1.0f)
             {
                 // Reload complete
                 animations.SetInteger("Reload", -1);
                 isReloading = false;
+                Reload = false;
+                totalbullets -= tempBullets - bullets;
+                bullets = tempBullets;
             }
         }
     }
@@ -105,7 +164,7 @@ public class GunTrigger : MonoBehaviour
 
         bool Scope = Input.GetKey(KeyCode.Mouse1);
 
-        if (Scope)
+        if (Scope && !Input.GetKey(KeyCode.LeftShift))
         {
             animations.SetBool("Sight", true);
         }
@@ -114,4 +173,20 @@ public class GunTrigger : MonoBehaviour
             animations.SetBool("Sight", false);
         }
     }
+
+    //Encapsulation
+    public string GetAmmo()
+    {
+        return bullets.ToString();
+    }
+
+    public string GetTotalAmmo()
+    {
+        return totalbullets.ToString();
+    }
+
+
 }
+
+
+

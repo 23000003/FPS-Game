@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -6,12 +7,12 @@ using UnityEngine;
 public class PlayerMovements : MonoBehaviour
 {
     public Camera playerCamera;
-    public float walkSpeed = 5f;
-    public float runSpeed = 7f;
-    public float jumpPower = 8f;
-    public float gravity = 20f; 
+    public float walkSpeed = 3f;
+    public float runSpeed = 3f;
+    public float jumpPower = 1.4f;
+    public float gravity = 7f;
     public float lookSpeed = 3f;
-    public float lookXLimit = 80f;
+    public float lookXLimit = 60f;
     public float defaultHeight = 2f;
     public float crouchHeight = 1f;
     public float crouchSpeed = 3f;
@@ -33,7 +34,6 @@ public class PlayerMovements : MonoBehaviour
     {
         Vector3 forward = transform.TransformDirection(Vector3.forward);
         Vector3 right = transform.TransformDirection(Vector3.right);
-
         bool isRunning = Input.GetKey(KeyCode.LeftShift);
         float curSpeedX = canMove ? (isRunning ? runSpeed : walkSpeed) * Input.GetAxis("Vertical") : 0;
         float curSpeedY = canMove ? (isRunning ? runSpeed : walkSpeed) * Input.GetAxis("Horizontal") : 0;
@@ -64,12 +64,12 @@ public class PlayerMovements : MonoBehaviour
         else
         {
             characterController.height = defaultHeight;
-            walkSpeed = 6f;
-            runSpeed = 12f;
+            walkSpeed = 3f;
+            runSpeed = 5f;
         }
 
         characterController.Move(moveDirection * Time.deltaTime);
-
+  
         if (canMove)
         {
             rotationX += -Input.GetAxis("Mouse Y") * lookSpeed;
