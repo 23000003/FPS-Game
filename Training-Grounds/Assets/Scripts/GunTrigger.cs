@@ -18,14 +18,22 @@ public class GunTrigger : MonoBehaviour
     [SerializeField] private AudioClip reloadClip;
     [SerializeField] private AudioSource fireSource;
     [SerializeField] private AudioSource reloadSource;
-   
-    // will use a Setter make it private
+
+    [SerializeField] private GameObject cameraRayCast;
+    [SerializeField] private GameObject bulletEffect;
+
+    [SerializeField] private CameraShake cameraShake;
+
     private float bulletSpeed;
     private float fireRate; 
     private float reloadDuration;
     private float reloadTimeRemaining;
-    private int bullets;
-    private int totalbullets;
+
+    private GunRecoil recoil_script;
+
+    //Encapsulation
+    public int bullets { get; private set; }
+    public int totalbullets { get; private set; }
 
     //This is not a constructor but a function setter :))
     protected void GunSettings(float bulletSpeed, float fireRate, float reloadDuration,
@@ -37,6 +45,7 @@ public class GunTrigger : MonoBehaviour
         this.reloadTimeRemaining = reloadTimeRemaining;
         this.bullets = bullets;
         this.totalbullets = totalbullets;
+        print(this.bullets);
         tempBullets = bullets;
     }
 
@@ -45,12 +54,17 @@ public class GunTrigger : MonoBehaviour
     private bool isReloading = false;
     private int tempBullets;
 
+
+
     protected virtual void Start()
     {
         // Access to the animations controller
         animations = gameObject.GetComponent<Animator>();
         animations.SetInteger("Movement", 0);
         InstantiateAudio(fireClip, reloadClip);
+        recoil_script = transform.GetComponentInParent<GunRecoil>();
+        cameraShake = transform.GetComponentInParent<CameraShake>();
+
     }
 
     protected virtual void Update()
@@ -77,10 +91,17 @@ public class GunTrigger : MonoBehaviour
             // if enough time has passed to fire again
             if (Time.time > nextFireTime && bullets > 0)
             {
-                // Instantiate the bullet (Fire)
-                var bullet = Instantiate(bulletPrefab, bulletSpawn.position, bulletSpawn.rotation);
-                bullet.GetComponent<Rigidbody>().velocity = bulletSpawn.forward * bulletSpeed;
-                
+                // Instantiate the bullet (Fire) (will delete(?))
+                //var bullet = Instantiate(bulletPrefab, bulletSpawn.position, bulletSpawn.rotation);
+                //bullet.GetComponent<Rigidbody>().velocity = bulletSpawn.forward * bulletSpeed;
+
+                //Bullets/Fire Effects
+                RaycastHit fireGun;
+                if(Physics.Raycast(cameraRayCast.transform.position, cameraRayCast.transform.forward, out fireGun))
+                {
+                    Instantiate(bulletEffect, fireGun.point, Quaternion.LookRotation(fireGun.normal));
+                }
+
                 // Gun Fire Sound Effects
                 fireSource.PlayOneShot(fireClip);
 
@@ -89,7 +110,16 @@ public class GunTrigger : MonoBehaviour
 
                 // Set the time for the next shot
                 nextFireTime = Time.time + fireRate;
-    
+
+                //Recoil
+                recoil_script.RecoilFire();
+
+                // Trigger Camera Shake
+                if (cameraShake != null)
+                {
+                    cameraShake.Shake(0.1f, 0.2f); // Adjust duration and magnitude as needed
+                }
+
                 if (Input.GetMouseButtonDown(0)) // 1 tap
                 {
                     animations.SetInteger("Fire", 1);
@@ -173,18 +203,6 @@ public class GunTrigger : MonoBehaviour
             animations.SetBool("Sight", false);
         }
     }
-
-    //Encapsulation
-    public string GetAmmo()
-    {
-        return bullets.ToString();
-    }
-
-    public string GetTotalAmmo()
-    {
-        return totalbullets.ToString();
-    }
-
 
 }
 

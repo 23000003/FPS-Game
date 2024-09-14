@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-//INHERITANCE
+//POLYMORPHISM
 public class AssaultRifle : GunTrigger
 {
     protected override void Start()

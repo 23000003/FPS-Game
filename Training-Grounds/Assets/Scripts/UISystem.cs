@@ -17,10 +17,10 @@ public class UISystem : MonoBehaviour
 
     private void Update()
     {
-        SetAmmo(getGun.GetAmmo() + " / " + getGun.GetTotalAmmo());
+        SetAmmo(getGun.bullets.ToString() + " / " + getGun.totalbullets.ToString());
     }
 
-    public void SetAmmo(string ammo)
+    private void SetAmmo(string ammo)
     {
         gunAmmo.text = ammo;
     }
