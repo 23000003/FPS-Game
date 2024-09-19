@@ -31,7 +31,9 @@ Click Add project and choose the the folder "Training Grounds" that you cloned
 - [x] **Encapsulation**
 - [x] **Inheritance**
 - [ ] **Abstraction**
-- [ ] **Polymorphism**
+- [x] **Polymorphism**
+    - [ ] **late-binding**
+    - [ ] **early-binding**
 
 ## ROADMAP
 - [ ] **Player and Gun Functionality** (me)
