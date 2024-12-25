@@ -2,42 +2,47 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class PlayerStats : MonoBehaviour
+public class PlayerStats
 {
-    [SerializeField] private float maxHealth;
+    private readonly float maxHealth;
     private float currentHealth;
+    private int kills = 0;
 
-    public void Start()
+    public PlayerStats(float maxHealth)
     {
-        currentHealth = maxHealth;
-        HealthBarUI.instance.SetHealthBarUI(maxHealth);
+        this.maxHealth = maxHealth;
     }
 
-    public float GetCurrentHealth()
+    public int GetKills() { return kills; }
+
+    public void SetKills(int kills) { this.kills = kills; }
+
+    public void ConfigureStats() // start
     {
-        return currentHealth;
+        currentHealth = maxHealth;
+        UISystem.Instance.GetHealthBarUI().SetHealthBarUI(maxHealth);
+    }
+
+    public void UpdateHealth() // Update
+    {
+        if(currentHealth <= 0){
+            Die();
+        }
+
+        UISystem.Instance.GetHealthBarUI().SetHealthBar(currentHealth);
     }
 
     public void TakeDamage(float amount)
     {
         currentHealth -= amount;
-        HealthBarUI.instance.SetHealthBar(currentHealth);
     }
 
-    private void Update()
-    {
-        if(currentHealth > maxHealth){
-            currentHealth = maxHealth;
-        }
-
-        if(currentHealth <= 0){
-            Die();
-        }
-    }
 
     private void Die()
     {
         Debug.Log("You died");
+        GameState.Instance.Respawn();
+        currentHealth = maxHealth;
     }
 
 }

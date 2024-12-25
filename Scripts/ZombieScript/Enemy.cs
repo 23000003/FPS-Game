@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.AI;
 
-public abstract class Zombie : MonoBehaviour
+public abstract class Enemy : MonoBehaviour
 {
     [Header("AI Initialization")]
     [SerializeField] protected NavMeshAgent agent;

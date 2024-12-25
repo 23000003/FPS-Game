@@ -4,38 +4,45 @@ using System.Collections.Generic;
 using UnityEngine;
 
 [RequireComponent(typeof(CharacterController))]
-public class PlayerMovements : MonoBehaviour
+public class PlayerMovements
 {
-    public Camera playerCamera;
-    public float walkSpeed = 3f;
-    public float runSpeed = 3f;
-    public float jumpPower = 1.4f;
-    public float gravity = 7f;
-    public float lookSpeed = 3f;
-    public float lookXLimit = 60f;
-    public float defaultHeight = 2f;
-    public float crouchHeight = 1f;
-    public float crouchSpeed = 3f;
-
-    public Vector3 moveDirection = Vector3.zero;
+    private float walkSpeed = 3.4f;
+    private float runSpeed = 4.7f;
     private float rotationX = 0;
-    private CharacterController characterController;
+    private bool isOnGround = true; // new
+    private readonly float jumpPower = 3.0f;
+    private readonly float gravity = 10f;
+    private readonly float lookSpeed = 1f;
+    private readonly float lookXLimit = 50f;
+    private readonly float defaultHeight = 2f;
+    private readonly float crouchHeight = 1f;
+    private readonly float crouchSpeed = 1.5f;
+    private readonly bool canMove = true;
+    private float jumpStartHeight = 0f;
+    private float previousHeight = 0f;
+    private float handsRotationX = -4f;
 
-    private bool canMove = true;
+    private Vector3 moveDirection = Vector3.zero;
 
-    void Start()
+    private readonly Camera playerCamera;
+    private readonly CharacterController characterController;
+    private readonly Transform transform;
+
+    public bool GetIsOnGround() {  return isOnGround; }
+
+    public PlayerMovements(CharacterController controller, Camera camera, Transform transform) {
+        characterController = controller;
+        playerCamera = camera;
+        this.transform = transform;
+    }
+
+    public void ConfigCursor()
     {
-        characterController = GetComponent<CharacterController>();
         Cursor.lockState = CursorLockMode.Locked;
         Cursor.visible = false;
     }
 
-    private void Update()
-    {
-        MovementSettings();
-    }
-
-    public void MovementSettings()
+    public void MovementController()
     {
         Vector3 forward = transform.TransformDirection(Vector3.forward);
         Vector3 right = transform.TransformDirection(Vector3.right);
@@ -47,11 +54,6 @@ public class PlayerMovements : MonoBehaviour
 
         Jump(movementDirectionY);
 
-        if (!characterController.isGrounded)
-        {
-            moveDirection.y -= gravity * Time.deltaTime;
-        }
-
         Crouch();
 
         characterController.Move(moveDirection * Time.deltaTime);
@@ -61,14 +63,76 @@ public class PlayerMovements : MonoBehaviour
 
     private void Jump(float movementDirectionY)
     {
+
         if (Input.GetButton("Jump") && canMove && characterController.isGrounded)
         {
             moveDirection.y = jumpPower;
+            jumpStartHeight = transform.position.y;
+            previousHeight = transform.position.y;
+            isOnGround = false;
         }
         else
         {
             moveDirection.y = movementDirectionY;
         }
+
+        Transform hands;
+
+        if (Player.Instance.GetWeaponSystem().GetWeaponSwitching().GetIsSecondary())
+        {
+            hands = GameObject.FindGameObjectWithTag("2ndWeapon").GetComponent<Transform>();
+        }
+        else
+        {
+            hands = FindActiveObjectWithTag("Weapon").GetComponent<Transform>();
+        }
+
+        Quaternion currentRotation = hands.localRotation;
+
+        if (!characterController.isGrounded)
+        {
+            moveDirection.y -= gravity * Time.deltaTime;
+
+            float currentHeight = transform.position.y - jumpStartHeight;
+            float heightDifference = currentHeight - previousHeight;
+
+            if (currentHeight > 0)
+            {
+                handsRotationX = Mathf.Lerp(handsRotationX, -5f, Time.deltaTime * 6f);
+            }
+            else
+            {
+                handsRotationX = Mathf.Lerp(handsRotationX, -4f, Time.deltaTime * 6f); 
+            }
+
+            hands.localRotation = Quaternion.Euler(handsRotationX, currentRotation.eulerAngles.y, currentRotation.eulerAngles.z);
+            previousHeight = currentHeight;
+
+            isOnGround = false;
+
+        }
+        else
+        {
+            handsRotationX = Mathf.Lerp(handsRotationX, 0f, Time.deltaTime * 10f);
+            hands.localRotation = Quaternion.Euler(handsRotationX, currentRotation.eulerAngles.y, currentRotation.eulerAngles.z);
+            jumpStartHeight = 0f;
+            previousHeight = 0f;
+
+            isOnGround = true;
+        }
+    }
+
+    private GameObject FindActiveObjectWithTag(string tag)
+    {
+        GameObject[] objects = GameObject.FindGameObjectsWithTag(tag);
+        foreach (GameObject obj in objects)
+        {
+            if (obj.activeSelf) // Check if the object is active
+            {
+                return obj; // Return the first active object
+            }
+        }
+        return null; // Return null if no active object with the tag is found
     }
 
     private void Crouch()
@@ -83,8 +147,8 @@ public class PlayerMovements : MonoBehaviour
         else
         {
             characterController.height = defaultHeight;
-            walkSpeed = 3f;
-            runSpeed = 5f;
+            walkSpeed = 3.4f;
+            runSpeed = 4.7f;
         }
     }
 

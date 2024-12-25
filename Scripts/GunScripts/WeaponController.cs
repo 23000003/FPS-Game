@@ -32,8 +32,8 @@ public class WeaponController : Weapon
     private bool Reload = false;
     private bool isReloading = false;
 
-    public WeaponController(float bulletSpeed, float fireRate, float reloadDuration, float reloadTimeRemaining, int bullets, int totalbullets, float reloadTime)
-        : base(bulletSpeed, fireRate, reloadDuration, reloadTimeRemaining, bullets, totalbullets, reloadTime)
+    public WeaponController(float bulletSpeed, float fireRate, float reloadDuration, float reloadTimeRemaining, int bullets, int totalbullets, float reloadTime, float damage)
+        : base(bulletSpeed, fireRate, reloadDuration, reloadTimeRemaining, bullets, totalbullets, reloadTime, damage)
     {
     }
 
@@ -48,7 +48,7 @@ public class WeaponController : Weapon
     }
 
     protected virtual void SetWeaponSettings(float bulletSpeed, float fireRate, float reloadDuration,
-                            float reloadTimeRemaining, int bullets, int totalbullets, float reloadTime)
+                            float reloadTimeRemaining, int bullets, int totalbullets, float reloadTime, float damage)
     {
         this.SetBullets(bullets);
         this.SetBulletSpeed(bulletSpeed);
@@ -60,6 +60,7 @@ public class WeaponController : Weapon
         this.SetTotalBullets(totalbullets);
         this.SetTempTotalBullets(totalbullets);
         this.SetReloadTime(reloadTime);
+        this.SetWeaponDamage(damage);
     }
 
     protected virtual void Start()
@@ -78,7 +79,7 @@ public class WeaponController : Weapon
         GunPerspectiveMovements();
     }
 
-    protected override void InstantiateAudio(AudioClip Fireclip, AudioClip reloadClip)
+    private void InstantiateAudio(AudioClip Fireclip, AudioClip reloadClip)
     {
         fireSource = gameObject.AddComponent<AudioSource>();
         fireSource.playOnAwake = false;
@@ -92,14 +93,11 @@ public class WeaponController : Weapon
     private void HandleShooting()
     {
         // if left click is on hold by user
-        if (Input.GetMouseButton(0) && !Input.GetKey(KeyCode.LeftShift) && GetBullets() > 0)
+        if (Input.GetMouseButton(0) && !Input.GetKey(KeyCode.LeftShift) && !GameState.Instance.IsGameOver())
         {
             // if enough time has passed to fire again
-            if (Time.time > nextFireTime && !Reload)
+            if (Time.time > nextFireTime && !Reload && GetBullets() > 0)
             {
-                // Instantiate the bullet (Fire) (will delete(?))
-                //var bullet = Instantiate(bulletPrefab, bulletSpawn.position, bulletSpawn.rotation);
-                //bullet.GetComponent<Rigidbody>().velocity = bulletSpawn.forward * bulletSpeed;
 
                 //Bullets/Fire Effects
                 RaycastHit fireGun;
@@ -119,9 +117,12 @@ public class WeaponController : Weapon
                     {
                         // Make the zombie take damage
                         print("zombie hit");
-                        zombie.TakeDamage(10f);
+
+                        zombie.TakeDamage(this.GetWeaponDamage());
                         // will change the effect to blood
-                        Instantiate(bulletOnTargetEffect, fireGun.point, Quaternion.LookRotation(fireGun.normal));
+                 
+                        GameObject bloodEffect = Instantiate(bulletOnTargetEffect, fireGun.point, Quaternion.LookRotation(fireGun.normal));
+                        bloodEffect.transform.parent = zombie.transform;
                     }
                     else
                     {
@@ -137,6 +138,7 @@ public class WeaponController : Weapon
                 // Particle Effect
                 GameObject flashTrigger = Instantiate(flash, bulletSpawn.position, bulletSpawn.rotation);
                 flashTrigger.transform.parent = bulletSpawn.transform;
+
                 Destroy(flashTrigger, 0.18f);
 
                 // Set the time for the next shot
@@ -169,6 +171,18 @@ public class WeaponController : Weapon
         else
         {
             animations.SetInteger("Fire", -1);
+        }
+
+        if (Player.Instance.GetPlayerMovements().GetIsOnGround())
+        {
+            animations.SetFloat("Run", 1.3f);
+            print("HERE");
+        }
+        else
+        {
+            animations.SetFloat("Run", 0.5f);
+            print("HERE1");
+
         }
     }
 
@@ -236,6 +250,7 @@ public class WeaponController : Weapon
             animations.SetBool("Sight", false);
         }
     }
+
 
 }
 

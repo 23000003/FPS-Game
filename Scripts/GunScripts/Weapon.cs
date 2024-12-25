@@ -2,7 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public abstract class Weapon : MonoBehaviour
+public class Weapon : MonoBehaviour
 {
     public static Weapon Instance { get; set; }
 
@@ -15,6 +15,7 @@ public abstract class Weapon : MonoBehaviour
     private int tempBullets;
     private int tempTotalBullets;
     private float reloadTime;
+    private float damage;
 
     private WeaponRecoil recoil;
     private WeaponSway weaponSway;
@@ -26,7 +27,7 @@ public abstract class Weapon : MonoBehaviour
 
 
     public Weapon(float bulletSpeed, float fireRate, float reloadDuration,
-                            float reloadTimeRemaining, int bullets, int totalbullets, float reloadTime)
+                  float reloadTimeRemaining, int bullets, int totalbullets, float reloadTime, float damage)
     {
         this.bulletSpeed = bulletSpeed;
         this.fireRate = fireRate;
@@ -35,6 +36,7 @@ public abstract class Weapon : MonoBehaviour
         this.bullets = bullets;
         this.totalbullets = totalbullets;
         this.reloadTime = reloadTime;
+        this.damage = damage;
         tempBullets = bullets;
         tempTotalBullets = totalbullets;
     }
@@ -48,7 +50,9 @@ public abstract class Weapon : MonoBehaviour
     public int GetTempBullets() {return tempBullets; }
     public float GetReloadTime() { return reloadTime; }
     public int GetTempTotalBullets() { return tempTotalBullets; }
+    public float GetWeaponDamage() { return damage; }
 
+    public void SetWeaponDamage(float damage) { this.damage = damage; }
     public void SetBulletSpeed(float bulletSpeed) {  this.bulletSpeed = bulletSpeed; }
     public void SetFireRate(float fireRate) {  this.fireRate = fireRate; }
     public void SetReloadDuration(float reloadDuration) {  this.reloadDuration = reloadDuration; }
@@ -59,5 +63,4 @@ public abstract class Weapon : MonoBehaviour
     public void SetReloadTime(float reloadTime) {  this.reloadTime = reloadTime; }
     public void SetTempTotalBullets(int totalBullets) { this.tempTotalBullets = totalBullets; }
 
-    protected abstract void InstantiateAudio(AudioClip Fireclip, AudioClip reloadClip);
 }

@@ -4,22 +4,15 @@ using UnityEngine;
 using UnityEngine.Events;
 using UnityEngine.UI;
 
-public class Interactable : MonoBehaviour
+public abstract class Interactable : MonoBehaviour
 {
     [SerializeField] private string message;
     [SerializeField] private UnityEvent onInteraction;
-    [SerializeField] private int index;
-    Outline outline;
+    private Outline outline;
 
-    public string getMessage()
-    {
-        return this.message;
-    }
-
-    public int GetIndex()
-    {
-        return index;
-    }
+    public string GetMessage() { return this.message; }
+    public Outline GetOutline() { return outline; }
+    public UnityEvent GetOnInteraction() { return onInteraction; }
 
     void Start()
     {
@@ -27,19 +20,8 @@ public class Interactable : MonoBehaviour
         DisableOutline();
     }
 
-    public void Interact()
-    {
-        onInteraction.Invoke();
-    }
-
-    public void DisableOutline()
-    {
-        outline.enabled = false;
-    }
-
-    public void EnableOutline()
-    {
-        outline.enabled = true;
-    }
+    public abstract void Interact();
+    public abstract void DisableOutline();
+    public abstract void EnableOutline();
 
 }

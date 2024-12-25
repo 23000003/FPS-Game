@@ -10,8 +10,8 @@ public class AssaultRifle : WeaponController
     //private WeaponRecoil recoil;
     //private WeaponSway weaponSway;
 
-    public AssaultRifle(float bulletSpeed, float fireRate, float reloadDuration, float reloadTimeRemaining, int bullets, int totalbullets, float reloadTime)
-        : base(bulletSpeed, fireRate, reloadDuration, reloadTimeRemaining, bullets, totalbullets, reloadTime)
+    public AssaultRifle(float bulletSpeed, float fireRate, float reloadDuration, float reloadTimeRemaining, int bullets, int totalbullets, float reloadTime, float damage)
+        : base(bulletSpeed, fireRate, reloadDuration, reloadTimeRemaining, bullets, totalbullets, reloadTime, damage)
     {
     }
 
@@ -33,7 +33,7 @@ public class AssaultRifle : WeaponController
         GetWeaponRecoil().CameraConfig();
         //recoil.CameraConfig();
         base.Start();
-        this.SetWeaponSettings(40f, 0.1f, 1.0f, 0f, 30, 200, -1.0f);
+        this.SetWeaponSettings(40f, 0.1f, 1.0f, 0f, 30, 200, -1.0f, 20f);
     }
 
     protected override void Update()
@@ -55,9 +55,9 @@ public class AssaultRifle : WeaponController
     // Start and Update (make it as interface too)
 
     protected override void SetWeaponSettings(float bulletSpeed, float fireRate, float reloadDuration,
-        float reloadTimeRemaining, int bullets, int totalbullets, float reloadTime)
+        float reloadTimeRemaining, int bullets, int totalbullets, float reloadTime, float damage)
     {
-        base.SetWeaponSettings(bulletSpeed, fireRate, reloadDuration, reloadTimeRemaining, bullets, totalbullets, reloadTime);
+        base.SetWeaponSettings(bulletSpeed, fireRate, reloadDuration, reloadTimeRemaining, bullets, totalbullets, reloadTime, damage);
     }
 
     protected override void SetRecoilAndSwaySettings(WeaponRecoil recoil, WeaponSway weaponSway)

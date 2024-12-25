@@ -9,8 +9,8 @@ public class SMG : WeaponController
     //private WeaponRecoil recoil;
     //private WeaponSway weaponSway;
  
-    public SMG(float bulletSpeed, float fireRate, float reloadDuration, float reloadTimeRemaining, int bullets, int totalbullets, float reloadTime)
-        : base(bulletSpeed, fireRate, reloadDuration, reloadTimeRemaining, bullets, totalbullets, reloadTime)
+    public SMG(float bulletSpeed, float fireRate, float reloadDuration, float reloadTimeRemaining, int bullets, int totalbullets, float reloadTime, float damage)
+        : base(bulletSpeed, fireRate, reloadDuration, reloadTimeRemaining, bullets, totalbullets, reloadTime, damage)
     {
     }
 
@@ -39,7 +39,7 @@ public class SMG : WeaponController
 
         GetWeaponRecoil().CameraConfig();
         base.Start(); // to start its inherited functionality
-        this.SetWeaponSettings(40f, 0.11f, 0.8f, 0f, 30, 200, -1.0f);
+        this.SetWeaponSettings(40f, 0.11f, 0.8f, 0f, 30, 200, -1.0f, 15f);
     }
 
     protected override void Update()
@@ -60,9 +60,9 @@ public class SMG : WeaponController
     // Start and Update (make it as interface too)
 
     protected override void SetWeaponSettings(float bulletSpeed, float fireRate, float reloadDuration,
-        float reloadTimeRemaining, int bullets, int totalbullets, float reloadTime)
+        float reloadTimeRemaining, int bullets, int totalbullets, float reloadTime, float damage)
     {
-        base.SetWeaponSettings(bulletSpeed, fireRate, reloadDuration, reloadTimeRemaining, bullets, totalbullets, reloadTime);
+        base.SetWeaponSettings(bulletSpeed, fireRate, reloadDuration, reloadTimeRemaining, bullets, totalbullets, reloadTime, damage);
     }
 
     protected override void SetRecoilAndSwaySettings(WeaponRecoil recoil, WeaponSway weaponSway)

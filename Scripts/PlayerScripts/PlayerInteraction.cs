@@ -1,52 +1,86 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Rendering;
 
-public class PlayerInteraction : MonoBehaviour
+public class PlayerInteraction
 {
     public static PlayerInteraction Instance { get; set; }
 
-    [SerializeField] private float playerReach = 3f;
-    [SerializeField] private GameObject cameraRayCast;
+    private readonly float playerReach;
+    private readonly GameObject cameraRayCast;
+    private string objectTag;
     private Interactable currInteractable;
+    private bool isPickedUp = false;
 
-    private string objectTag = "";
+    public PlayerInteraction(float playerReach, GameObject cameraRayCast, string objectTag)
+    {
+        this.playerReach = playerReach;
+        this.cameraRayCast = cameraRayCast;
+        this.objectTag = objectTag;
+        currInteractable = null;
+    }
+
     public string GetObjectTag() { return objectTag; }
+    public bool GetIsPickedUp() {  return isPickedUp; }
     public Interactable GetInteractable() { return currInteractable; }
 
-    private void Awake()
+    public void QuestObjectInteraction()
     {
-        Instance = this;
-    }
-
-    private void Update()
-    {
-        CheckInteraction();
-        QuestObjectInteraction(); 
-    }
-
-    private void QuestObjectInteraction()
-    {
-        if (Input.GetKeyDown(KeyCode.F) && currInteractable != null &&
-            (objectTag == "GoldKey" || objectTag == "DoorToCrate" || objectTag == "QuestCrate"))
+        if (Input.GetKey(KeyCode.F) && currInteractable != null &&
+            (objectTag == "Door" || objectTag == "Key" || objectTag == "Crate"))
         {
             currInteractable.Interact();
+
+            if(objectTag == "Crate")
+            {
+                GameState.Instance.SetIsCrateDone(true);
+                GameObject.FindGameObjectWithTag("CrateUI").SetActive(false);
+                UISystem.Instance.GetObjectiveUI().UpdatePickUpCrateText("1");
+            }
+
+            if(objectTag == "Key")
+            {
+                GameState.Instance.SetGoldKeysPicked(GameState.Instance.GetKeysPicked() + 1);
+                UISystem.Instance.GetObjectiveUI().UpdatePickUpKeyText(GameState.Instance.GetKeysPicked().ToString());
+            }
         }
     }
 
-    private void CheckInteraction()
+    public void CheckInteraction()
     {
         RaycastHit hit;
         Ray ray = new Ray(cameraRayCast.transform.position, cameraRayCast.transform.forward);
         if(Physics.Raycast(ray, out hit, playerReach))
         {
-            if(hit.collider.tag == "GoldKey" || hit.collider.tag == "DoorToCrate" ||
-                hit.collider.tag == "QuestCrate" || hit.collider.tag == "AmmoBox" || 
-                hit.collider.tag == "PickUpWeapons" || hit.collider.tag == "PickUpPistol")
+            //hit.collider.tag == "GoldKey" || hit.collider.tag == "DoorToCrate" ||
+            //    hit.collider.tag == "QuestCrate" || hit.collider.tag == "AmmoBox" ||
+            //    hit.collider.tag == "PickUpWeapons" || hit.collider.tag == "PickUpPistol"
+            if (hit.collider.tag == "QuestObject" || hit.collider.tag == "GameObject")
             {
-                Interactable newInteractable = hit.collider.GetComponent<Interactable>();
+                Interactable newInteractable;
 
-                objectTag = hit.collider.tag;
+                if (hit.collider.tag == "QuestObject")
+                {
+                    newInteractable = hit.collider.GetComponent<InteractQuestObjects>();
+
+                    if(newInteractable is InteractQuestObjects i)
+                    {
+                        objectTag = i.GetObjectQuestType();
+                    }
+                }
+                else
+                {
+                    newInteractable = hit.collider.GetComponent<InteractGameObjects>();
+
+                    if (newInteractable is InteractGameObjects i)
+                    {
+                        objectTag = i.GetGameObjectType();
+                    }
+
+                }
+
+                isPickedUp = Input.GetKey(KeyCode.F);
 
                 if(currInteractable && newInteractable != currInteractable)
                 {
@@ -55,9 +89,8 @@ public class PlayerInteraction : MonoBehaviour
 
                 if (newInteractable.enabled)
                 {
-                    SetNewCurrentInteractable(newInteractable, hit);
+                    SetNewCurrentInteractable(newInteractable);
                 }
-
                 else
                 {
                     DisableCurrentInteractable();
@@ -66,20 +99,21 @@ public class PlayerInteraction : MonoBehaviour
             else
             {
                 objectTag = "";
+                isPickedUp = false;
                 DisableCurrentInteractable();
             }
         }
         else
         {
+            isPickedUp = false;
             DisableCurrentInteractable();
             objectTag = "";
         }
     }
 
-    private void SetNewCurrentInteractable(Interactable newInteractable, RaycastHit hit)
+    private void SetNewCurrentInteractable(Interactable newInteractable)
     {
-        print(newInteractable.getMessage());
-        PickupTextUI.instance.EnableInteractionText(newInteractable.getMessage(), hit);
+        UISystem.Instance.GetObjectiveUI().EnableInteractionText(newInteractable.GetMessage());
         currInteractable = newInteractable;
         currInteractable.EnableOutline();
         
@@ -87,7 +121,7 @@ public class PlayerInteraction : MonoBehaviour
 
     private void DisableCurrentInteractable()
     {
-        PickupTextUI.instance.DisableInteractionText();
+        UISystem.Instance.GetObjectiveUI().DisableInteractionText();
         if (currInteractable)
         {
             currInteractable.DisableOutline();

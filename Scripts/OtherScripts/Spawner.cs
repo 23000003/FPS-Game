@@ -4,11 +4,17 @@ using UnityEngine;
 
 public class Spawner : MonoBehaviour
 {
+    public static Spawner Instance { get; private set; }
+
     [SerializeField] private GameObject zombie;
+    [SerializeField] private GameObject wolf;
+    [SerializeField] private GameObject boss;
     [SerializeField] private float spawnInterval = 5f;
     [SerializeField] private int maxZombies = 10;
+    [SerializeField] private int maxWolf = 5;
     private Transform[] spawnPoints;
     private int currentZombieCount = 0;
+    private int currentWolfCount = 0;
 
 
     private void Start(){
@@ -20,9 +26,22 @@ public class Spawner : MonoBehaviour
         }
 
         InvokeRepeating(nameof(SpawnZombie), spawnInterval, spawnInterval);
+        InvokeRepeating(nameof(SpawnWolf), spawnInterval, spawnInterval);
     }
 
     private void SpawnZombie()
+    {
+        if (currentWolfCount >= maxWolf)
+        {
+            return;
+        }
+
+        int randomID = Random.Range(0, spawnPoints.Length);
+        Instantiate(wolf, spawnPoints[randomID].transform.position, spawnPoints[randomID].transform.rotation);
+        currentWolfCount++;
+    }
+
+    private void SpawnWolf()
     {
         if (currentZombieCount >= maxZombies)
         {
@@ -33,7 +52,10 @@ public class Spawner : MonoBehaviour
         Instantiate(zombie, spawnPoints[randomID].transform.position, spawnPoints[randomID].transform.rotation);
         currentZombieCount++;
     }
-
+    private void SpawnBoss()
+    {
+        Instantiate(boss, spawnPoints[2].transform.position, spawnPoints[2].transform.rotation);
+    }
 
     public void decrementZCount()
     {

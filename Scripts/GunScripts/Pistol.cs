@@ -7,8 +7,8 @@ public class Pistol : WeaponController
     //private WeaponRecoil recoil;
     //private WeaponSway weaponSway;
 
-    public Pistol(float bulletSpeed, float fireRate, float reloadDuration, float reloadTimeRemaining, int bullets, int totalbullets, float reloadTime)
-        : base(bulletSpeed, fireRate, reloadDuration, reloadTimeRemaining, bullets, totalbullets, reloadTime)
+    public Pistol(float bulletSpeed, float fireRate, float reloadDuration, float reloadTimeRemaining, int bullets, int totalbullets, float reloadTime, float damage)
+        : base(bulletSpeed, fireRate, reloadDuration, reloadTimeRemaining, bullets, totalbullets, reloadTime, damage)
     {
     }
 
@@ -37,7 +37,7 @@ public class Pistol : WeaponController
         //recoil.CameraConfig();
         GetWeaponRecoil().CameraConfig();
         base.Start(); // to start its inherited functionality
-        this.SetWeaponSettings(15f, 0.15f, 1.5f, 0f, 14, 124, -0.1f);
+        this.SetWeaponSettings(15f, 0.15f, 1.5f, 0f, 14, 124, -0.1f, 8f);
     }
 
     protected override void Update()
@@ -58,9 +58,9 @@ public class Pistol : WeaponController
     // Start and Update (make it as interface too)
 
     protected override void SetWeaponSettings(float bulletSpeed, float fireRate, float reloadDuration,
-        float reloadTimeRemaining, int bullets, int totalbullets, float reloadTime)
+        float reloadTimeRemaining, int bullets, int totalbullets, float reloadTime, float damage)
     {
-        base.SetWeaponSettings(bulletSpeed, fireRate, reloadDuration, reloadTimeRemaining, bullets, totalbullets, reloadTime);
+        base.SetWeaponSettings(bulletSpeed, fireRate, reloadDuration, reloadTimeRemaining, bullets, totalbullets, reloadTime, damage);
     }
 
     protected override void SetRecoilAndSwaySettings(WeaponRecoil recoil, WeaponSway weaponSway)

@@ -16,15 +16,19 @@ public class WeaponPickUp
 
     public void PickUpWeapon()
     {
-        if (Input.GetKeyDown(KeyCode.F) && PlayerInteraction.Instance.GetObjectTag() == "PickUpWeapons"
-            && PlayerInteraction.Instance.GetInteractable().GetIndex() != currGunActive )
+        if (Input.GetKeyDown(KeyCode.F) && Player.Instance.GetPlayerInteraction().GetObjectTag() == "PrimaryWeapons")
         {
-
-            GameObject currGun = primary[currGunActive];
-            currGun.SetActive(false);
-            currGunActive = PlayerInteraction.Instance.GetInteractable().GetIndex();
-            primary[currGunActive].SetActive(true);
-
+            // Player.Instance.GetPlayerInteraction().GetInteractable().GetIndex() != currGunActive
+            if (Player.Instance.GetPlayerInteraction().GetInteractable() is InteractGameObjects i)
+            {
+                if(i.GetIndex() != currGunActive)
+                {
+                    GameObject currGun = primary[currGunActive];
+                    currGun.SetActive(false);
+                    currGunActive = i.GetIndex();
+                    primary[currGunActive].SetActive(true);
+                }
+            }
         }
     }
 }

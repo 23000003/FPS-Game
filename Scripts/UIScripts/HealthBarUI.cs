@@ -3,15 +3,14 @@ using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.UI;
 
-public class HealthBarUI : MonoBehaviour
+public class HealthBarUI
 {
-    public static HealthBarUI instance;
 
-    public Slider healthSlider;
+    private readonly Slider healthSlider;
 
-    private void Awake()
+    public HealthBarUI(Slider slider)
     {
-        instance = this;
+        healthSlider = slider;
     }
 
     public void SetHealthBar(float amount)

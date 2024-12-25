@@ -6,32 +6,46 @@ using UnityEngine.AI;
 
 // will improve attack animation/damage
 
-public class ZombieController : Zombie
+public class ZombieController : Enemy
 {
     protected override void Attack(){
         if (agent.pathStatus == NavMeshPathStatus.PathComplete && agent.remainingDistance < 0.8f && agent.hasPath)
         {
 
-            if(agent.remainingDistance < 0.10f){
+            if(agent.remainingDistance < 0.10f)
+            {
                 transform.LookAt(target.gameObject.transform);
             }
 
-            if(Time.time >= lastAttackTime + cooldown){
+            if(Time.time >= lastAttackTime + cooldown)
+            {
                 agent.isStopped = true;                                                          // stops moving
-                if (animations != null) animations.SetBool("Attack", true);                     // attack animation
-                target.GetComponent<PlayerStats>().TakeDamage(1f);                              // damage player
+
+                if (animations != null)
+                {
+                    animations.SetBool("Attack", true);
+                }// attack animation
+
+                Player.Instance.GetStats().TakeDamage(5f);                              // damage player
                 lastAttackTime = Time.time;                                                     // reset cooldown
+                
             }
 
         }
         else
         {
-            agent.isStopped = false; 
-            if (animations != null) animations.SetBool("Attack", false);
+            agent.isStopped = false;
+
+            if (animations != null)
+            {
+                animations.SetBool("Attack", false);
+            }
         }
 
-        if(currentHealth <= 0){
+        if(currentHealth <= 0)
+        {
             Die();
+            Player.Instance.GetStats().SetKills(Player.Instance.GetStats().GetKills() + 1);
         }        
     }
 
@@ -50,11 +64,19 @@ public class ZombieController : Zombie
     protected override void Die()
     {   
         isDead = true;
-        if (animations != null) animations.SetBool("Dead", true);
+        
+        if (animations != null)
+        {
+            animations.SetBool("Dead", true);
+        }
+        
         Debug.Log("zombie died");
-        if(zombieSpawner != null){
+
+        if(zombieSpawner != null)
+        {
             zombieSpawner.decrementZCount();
         }
+
         Destroy(gameObject, 3f);
     }
 
