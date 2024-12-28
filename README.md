@@ -2,6 +2,9 @@
 - OOP Final Project using OOP Concepts and Exceptions.
 - Made with Unity C#
 
+## Background
+A First Person Shooter Game with a quest called 'Deliver The Crate' where you have to defend yourself from zombies, complete the objectives and deliver the crate to its destination. 
+
 ## Download Assets File (Get latest Version)
 https://drive.google.com/drive/folders/1A1eOT5NN3V_SUDBZKeZ9MEfZRn0MaL8f?dmr=1&ec=wgc-drive-globalnav-goto
 
