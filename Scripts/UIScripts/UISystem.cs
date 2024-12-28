@@ -15,6 +15,7 @@ public class UISystem : MonoBehaviour
     private ObjectiveUI objUI;
 
     [SerializeField] private TextMeshProUGUI gunAmmo;
+    [SerializeField] private TMP_Text bossAppeared;
 
     //objUI
     [SerializeField] private TMP_Text circlePointUIText;
@@ -37,7 +38,10 @@ public class UISystem : MonoBehaviour
         healthBarUI = new HealthBarUI(GameObject.FindGameObjectWithTag("HealthBarSlider").GetComponent<Slider>());
         progressBarUI = new ProgressBarUI(slider);
         objUI = new ObjectiveUI(interactionText, keyUIText, circlePointUIText, crateUIText);
+        bossAppeared.enabled = false;
     }
+
+    private bool isBossAppeared = false;
 
     private void Update()
     {
@@ -46,6 +50,12 @@ public class UISystem : MonoBehaviour
         {
             SetAmmoUIText();
             progressBarUI.UpdateProgress();
+
+            if(GameState.Instance.GetIsCrateDone() && !isBossAppeared)
+            {
+                StartCoroutine(ShowBossAppearedText());
+                isBossAppeared = true;
+            }
         }
         catch (NullReferenceException err)
         {
@@ -53,6 +63,14 @@ public class UISystem : MonoBehaviour
         }
     }
 
+    private IEnumerator ShowBossAppearedText()
+    {
+        bossAppeared.enabled = true;
+        
+        yield return new WaitForSeconds(4f);
+
+        bossAppeared.enabled = false;
+    }
 
     private void SetAmmoUIText()
     {

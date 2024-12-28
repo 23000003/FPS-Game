@@ -45,7 +45,7 @@ public class Player : MonoBehaviour
 
             playSoundEffects = new PlaySoundEffects(footstepSF, sprintSF, jumpSF, pickUpSF);
 
-            stats = new PlayerStats(100);
+            stats = new PlayerStats(200);
         
         }
         catch(NullReferenceException e)

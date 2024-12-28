@@ -19,9 +19,9 @@ public class WeaponSystem
     {
         try
         {
- 
+
             AssignPrimaryWeapons();
-            
+
             // Find the secondary weapon and player
             GameObject secondary = GameObject.FindGameObjectWithTag("2ndWeapon");
             GameObject player = GameObject.FindGameObjectWithTag("Player");
@@ -102,6 +102,7 @@ public class WeaponSystem
             Debug.LogError("IndexOutOfRangeException: " + e.Message);
         }
     }
+
 
     public void UpdateWeaponSystem() 
     {

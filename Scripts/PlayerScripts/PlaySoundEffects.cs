@@ -13,7 +13,6 @@ public class PlaySoundEffects
     private bool isRunning = false;
     private bool isWalking = false;
     private bool isJumping = false;
-    private bool jumpHelper = false;
 
     public PlaySoundEffects(GameObject footstepSF, GameObject sprintSF, GameObject jumpSF, GameObject pickUpSF) 
     {
@@ -23,7 +22,7 @@ public class PlaySoundEffects
         this.pickUpSF = pickUpSF;
     }
 
-    
+    // Start is called before the first frame update
     public void ConfigureSoundEffects()
     {
         footstepSF.SetActive(false);
@@ -32,8 +31,9 @@ public class PlaySoundEffects
         //pickUpSF.SetActive(false);
     }
 
-
-    public void SoundEffectsMethods(bool isOnGround, bool isPickedUp)
+    private bool jumpHelper = false;
+    // Update is called once per frame
+    public void SoundEffectsMethods(bool isOnGround, bool isPickedUp) // update this
     {
 
         isJumping = !isOnGround;
@@ -83,7 +83,6 @@ public class PlaySoundEffects
                     jumpHelper = false;
                     Console.WriteLine("DOneJumped");
                 }
-                Console.WriteLine("NotInIsJumping");
             }
         }
         catch (System.Exception e)

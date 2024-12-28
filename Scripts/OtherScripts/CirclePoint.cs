@@ -14,6 +14,12 @@ public class CirclePoint : MonoBehaviour, ICirclePoint
             DisableProgressBar();
             UISystem.Instance.GetProgressBarUI().SetIsFinished(false);
             GameState.Instance.SetCirclePointCaptured(GameState.Instance.GetCirclePointCaptured() + 1);
+
+            if(GameState.Instance.GetCirclePointCaptured() == GameState.Instance.GetTotalCirclePoint())
+            {
+                GameObject.FindGameObjectWithTag("CrateBlocker").SetActive(false);
+            }
+
             UISystem.Instance.GetObjectiveUI().UpdatePickUpCirclePointText(GameState.Instance.GetCirclePointCaptured().ToString());
             GameState.Instance.EnableDisableCirclePoint(index, false);
         }

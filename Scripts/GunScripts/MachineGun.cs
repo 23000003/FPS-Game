@@ -28,8 +28,8 @@ public class MachineGun : WeaponController
         //this.recoil.GetCamera().enabled = true;
 
         this.SetRecoilAndSwaySettings(
-            new WeaponRecoil(1.5f, 1.5f, 0.25f, 9f, 1f),
-            new WeaponSway(0.05f, 0.1f, 6f, transform)
+            new WeaponRecoil(2.5f, 2.5f, 0.35f, 12f, 1f),
+            new WeaponSway(0.15f, 0.2f, 5f, transform)
         );
         GetWeaponRecoil().GetCamera().enabled = true;
     }
@@ -40,7 +40,7 @@ public class MachineGun : WeaponController
 
         GetWeaponRecoil().CameraConfig();
         base.Start(); // to start its inherited functionality
-        this.SetWeaponSettings(40f, 0.09f, 3.5f, 0f, 100, 300, -1.0f, 25f);
+        SetWeaponSettings(40f, 0.09f, 3.5f, 0f, 100, 300, -1.0f, 25f);
     }
 
     protected override void Update()
@@ -57,8 +57,6 @@ public class MachineGun : WeaponController
         //recoil.TriggerRecoilFire();
         //}
     }
-
-    // Start and Update (make it as interface too)
 
     protected override void SetWeaponSettings(float bulletSpeed, float fireRate, float reloadDuration,
         float reloadTimeRemaining, int bullets, int totalbullets, float reloadTime, float damage)

@@ -2,14 +2,6 @@ using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
-/** 
- * Inheritance: GunDetails
- * Polymorphism
- * References: AssaultRifle, SMG, Pistol
- * 
-**/
-
 public class WeaponController : Weapon
 {
 
@@ -50,17 +42,17 @@ public class WeaponController : Weapon
     protected virtual void SetWeaponSettings(float bulletSpeed, float fireRate, float reloadDuration,
                             float reloadTimeRemaining, int bullets, int totalbullets, float reloadTime, float damage)
     {
-        this.SetBullets(bullets);
-        this.SetBulletSpeed(bulletSpeed);
-        this.SetFireRate(fireRate);
-        this.SetReloadDuration(reloadDuration);
-        this.SetReloadTimeRemaining(reloadTimeRemaining);
-        this.SetTempBullets(bullets);
-        this.SetBullets(bullets);
-        this.SetTotalBullets(totalbullets);
-        this.SetTempTotalBullets(totalbullets);
-        this.SetReloadTime(reloadTime);
-        this.SetWeaponDamage(damage);
+        SetBullets(bullets);
+        SetBulletSpeed(bulletSpeed);
+        SetFireRate(fireRate);
+        SetReloadDuration(reloadDuration);
+        SetReloadTimeRemaining(reloadTimeRemaining);
+        SetTempBullets(bullets);
+        SetBullets(bullets);
+        SetTotalBullets(totalbullets);
+        SetTempTotalBullets(totalbullets);
+        SetReloadTime(reloadTime);
+        SetWeaponDamage(damage);
     }
 
     protected virtual void Start()
@@ -105,7 +97,7 @@ public class WeaponController : Weapon
                 {
 
                     //Detect if there is a zombie in the range of the fire path
-                    ZombieController zombie = fireGun.collider.GetComponentInParent<ZombieController>();
+                    Enemy zombie = fireGun.collider.GetComponentInParent<Enemy>();
                     //If the collider tag is a zombie do not summon bullet effect
                     /*
                         added additional condition for player because for some reason when the player
@@ -118,7 +110,7 @@ public class WeaponController : Weapon
                         // Make the zombie take damage
                         print("zombie hit");
 
-                        zombie.TakeDamage(this.GetWeaponDamage());
+                        zombie.TakeDamage(GetWeaponDamage());
                         // will change the effect to blood
                  
                         GameObject bloodEffect = Instantiate(bulletOnTargetEffect, fireGun.point, Quaternion.LookRotation(fireGun.normal));
@@ -142,7 +134,7 @@ public class WeaponController : Weapon
                 Destroy(flashTrigger, 0.18f);
 
                 // Set the time for the next shot
-                nextFireTime = Time.time + this.GetFireRate();
+                nextFireTime = Time.time + GetFireRate();
 
                 //recoil
                 GetWeaponRecoil().TriggerRecoilFire();
@@ -159,10 +151,10 @@ public class WeaponController : Weapon
 
                 animations.SetInteger("Movement", -1);
 
-                this.SetBullets(this.GetBullets() - 1);
+                SetBullets(GetBullets() - 1);
 
             }
-            else if (this.GetBullets() <= 0 && this.GetTotalbullets() > 0)
+            else if (GetBullets() <= 0 && GetTotalbullets() > 0)
             {
                 Reload = true;
                 
@@ -189,14 +181,14 @@ public class WeaponController : Weapon
     private void HandleReloading()
     {
         bool ManualReload = Input.GetKey(KeyCode.R);
-        if (Reload || (ManualReload && this.GetBullets() != this.GetTempBullets() && this.GetTotalbullets() > 0))
+        if (Reload || (ManualReload && GetBullets() != GetTempBullets() && GetTotalbullets() > 0))
         {
             if (!isReloading)
             {
                 // Start the reload process
                 isReloading = true;
                 //reloadTimeRemaining = reloadDuration;
-                this.SetReloadTimeRemaining(this.GetReloadDuration());
+                SetReloadTimeRemaining(GetReloadDuration());
                 Console.WriteLine("Reloading");
                 reloadSource.PlayOneShot(reloadClip);
                 animations.SetInteger("Reload", 0);
@@ -206,21 +198,23 @@ public class WeaponController : Weapon
         if (isReloading)
         {
             //reloadTimeRemaining -= Time.deltaTime;
-            this.SetReloadTimeRemaining(this.GetReloadTimeRemaining() - Time.deltaTime);
+            SetReloadTimeRemaining(GetReloadTimeRemaining() - Time.deltaTime);
 
-            if (this.GetReloadTimeRemaining() <= this.GetReloadTime())
+            if (GetReloadTimeRemaining() <= GetReloadTime())
             {
                 print("HERE 3");
+
                 // Reload complete
                 animations.SetInteger("Reload", -1);
                 isReloading = false;
                 Reload = false;
-                //totalbullets = (totalbullets - (tempBullets - bullets)) >= 0 ? totalbullets - (tempBullets - bullets) : 0;
-                this.SetTotalBullets( this.GetTotalbullets() - (this.GetTempBullets() - this.GetBullets()));
-                //bullets = tempBullets;
-                this.SetBullets( this.GetTempBullets() );
-                print(this.GetTotalbullets());
-                print(this.GetBullets());
+
+
+                int tempBullets = GetTempBullets() - GetBullets();
+                int tempTotalBullets = GetTotalbullets() - tempBullets >= 0 ? GetTotalbullets() - tempBullets : -1;
+                
+                SetBullets(tempTotalBullets == -1 ? GetBullets() + GetTotalbullets() : GetTempBullets());
+                SetTotalBullets(tempTotalBullets == -1 ? 0 : tempTotalBullets);
             }
         }
     }
@@ -239,7 +233,7 @@ public class WeaponController : Weapon
             animations.SetInteger("Movement", (idenMovement ? 0 : 1));
         }
 
-        bool Scope = Input.GetKey(KeyCode.Mouse2); // My mouse rightclick is broken, just change to Mouse1(rightClick)
+        bool Scope = Input.GetKey(KeyCode.Mouse1); // My mouse rightclick is broken, just change to Mouse1(rightClick)
 
         if (Scope && !Input.GetKey(KeyCode.LeftShift))
         {

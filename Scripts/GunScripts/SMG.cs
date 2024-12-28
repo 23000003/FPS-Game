@@ -57,8 +57,6 @@ public class SMG : WeaponController
         //}
     }
 
-    // Start and Update (make it as interface too)
-
     protected override void SetWeaponSettings(float bulletSpeed, float fireRate, float reloadDuration,
         float reloadTimeRemaining, int bullets, int totalbullets, float reloadTime, float damage)
     {

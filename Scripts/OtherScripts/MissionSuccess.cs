@@ -2,11 +2,11 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
-public class SemiEnding : MonoBehaviour
+public class MissionSuccess : MonoBehaviour
 {
-    public static SemiEnding Instance { get; private set; } 
+    public static MissionSuccess Instance { get; private set; } 
 
-    [SerializeField] private TextMeshProUGUI _textMeshPro;
+    [SerializeField] private TextMeshProUGUI textMS;
     [SerializeField] private float timeBtwnChars;
     [SerializeField] private float timeBtwnWords;
     [SerializeField] private string[] stringArr;
@@ -36,7 +36,6 @@ public class SemiEnding : MonoBehaviour
     {
         if (i < stringArr.Length)
         {
-            _textMeshPro.text = stringArr[i];
             StartCoroutine(TextVisible());
         }
         Instance = this;
@@ -44,14 +43,17 @@ public class SemiEnding : MonoBehaviour
 
     private IEnumerator TextVisible()
     {
-        _textMeshPro.ForceMeshUpdate();
-        int totalVisibleCharacters = _textMeshPro.textInfo.characterCount;
+        yield return new WaitForSeconds(1f);
+        textMS.text = stringArr[i];
+
+        textMS.ForceMeshUpdate();
+        int totalVisibleCharacters = textMS.textInfo.characterCount;
         int counter = 0;
 
         while (true)
         {
             int visibleCount = counter % (totalVisibleCharacters + 1);
-            _textMeshPro.maxVisibleCharacters = visibleCount;
+            textMS.maxVisibleCharacters = visibleCount;
 
             if(visibleCount >= totalVisibleCharacters)
             {
@@ -65,7 +67,7 @@ public class SemiEnding : MonoBehaviour
             yield return new WaitForSeconds(timeBtwnChars);
         }
 
-        yield return new WaitForSeconds(1.5f);
+        yield return new WaitForSeconds(2.5f);
 
         isDone = true;
 

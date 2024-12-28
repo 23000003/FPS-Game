@@ -6,7 +6,6 @@ public class EndingCirclePoint : MonoBehaviour, ICirclePoint
 {
     public static EndingCirclePoint Instance { get; private set; }
     private bool isGameOver = false;
-
     public bool GetIsGameOver() { return isGameOver; }
     public void SetIsGameOver(bool isGameOver) { this.isGameOver = isGameOver; }
 

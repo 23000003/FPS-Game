@@ -36,12 +36,12 @@ public class ObjectiveUI
     // ADD THE CRATE, CIRCLEPOINT HERE
     public void UpdatePickUpKeyText(string text)
     {
-        keyUIText.text = text + " / " + GameState.Instance.GetTotalKeys().ToString();
+        keyUIText.text = " : " + text + " / " + GameState.Instance.GetTotalKeys().ToString();
     }
 
     public void UpdatePickUpCirclePointText(string text)
     {
-        circlePointUIText.text = text + " / " + GameState.Instance.GetTotalCirclePoint().ToString();
+        circlePointUIText.text = " : " + text + " / " + GameState.Instance.GetTotalCirclePoint().ToString();
     }
 
     public void UpdatePickUpCrateText(string text)

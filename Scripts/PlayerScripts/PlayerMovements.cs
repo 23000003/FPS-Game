@@ -18,9 +18,9 @@ public class PlayerMovements
     private readonly float crouchHeight = 1f;
     private readonly float crouchSpeed = 1.5f;
     private readonly bool canMove = true;
-    private float jumpStartHeight = 0f;
-    private float previousHeight = 0f;
-    private float handsRotationX = -4f;
+    private float jumpStartHeight = 0f; // Track the starting height when the jump begins
+    private float previousHeight = 0f; // Store the previous height to calculate the velocity
+    private float handsRotationX = -4f; // Default rotation for hands when grounded
 
     private Vector3 moveDirection = Vector3.zero;
 
@@ -63,7 +63,6 @@ public class PlayerMovements
 
     private void Jump(float movementDirectionY)
     {
-
         if (Input.GetButton("Jump") && canMove && characterController.isGrounded)
         {
             moveDirection.y = jumpPower;
@@ -73,7 +72,7 @@ public class PlayerMovements
         }
         else
         {
-            moveDirection.y = movementDirectionY;
+            moveDirection.y = movementDirectionY; // Apply gravity when grounded
         }
 
         Transform hands;
@@ -91,23 +90,22 @@ public class PlayerMovements
 
         if (!characterController.isGrounded)
         {
-            moveDirection.y -= gravity * Time.deltaTime;
+            moveDirection.y -= gravity * Time.deltaTime; 
 
             float currentHeight = transform.position.y - jumpStartHeight;
             float heightDifference = currentHeight - previousHeight;
 
-            if (currentHeight > 0)
+            if (currentHeight > 0) // Player is going up
             {
-                handsRotationX = Mathf.Lerp(handsRotationX, -5f, Time.deltaTime * 6f);
+                handsRotationX = Mathf.Lerp(handsRotationX, -5f, Time.deltaTime * 6f); 
             }
-            else
+            else // Player is falling down
             {
                 handsRotationX = Mathf.Lerp(handsRotationX, -4f, Time.deltaTime * 6f); 
             }
 
             hands.localRotation = Quaternion.Euler(handsRotationX, currentRotation.eulerAngles.y, currentRotation.eulerAngles.z);
             previousHeight = currentHeight;
-
             isOnGround = false;
 
         }
@@ -115,9 +113,9 @@ public class PlayerMovements
         {
             handsRotationX = Mathf.Lerp(handsRotationX, 0f, Time.deltaTime * 10f);
             hands.localRotation = Quaternion.Euler(handsRotationX, currentRotation.eulerAngles.y, currentRotation.eulerAngles.z);
+
             jumpStartHeight = 0f;
             previousHeight = 0f;
-
             isOnGround = true;
         }
     }
@@ -127,12 +125,12 @@ public class PlayerMovements
         GameObject[] objects = GameObject.FindGameObjectsWithTag(tag);
         foreach (GameObject obj in objects)
         {
-            if (obj.activeSelf) // Check if the object is active
+            if (obj.activeSelf) 
             {
-                return obj; // Return the first active object
+                return obj;
             }
         }
-        return null; // Return null if no active object with the tag is found
+        return null;
     }
 
     private void Crouch()
@@ -160,6 +158,7 @@ public class PlayerMovements
             rotationX = Mathf.Clamp(rotationX, -lookXLimit, lookXLimit);
             playerCamera.transform.localRotation = Quaternion.Euler(rotationX, 0, 0);
             transform.rotation *= Quaternion.Euler(0, Input.GetAxis("Mouse X") * lookSpeed, 0);
+            transform.rotation = Quaternion.Euler(transform.rotation.eulerAngles.x, transform.rotation.eulerAngles.y, 0);
         }
     }
 }

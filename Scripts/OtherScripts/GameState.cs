@@ -13,20 +13,10 @@ public class GameState : MonoBehaviour
     private bool isGameOver = false;
     private int keysPicked = 0;
     private int circlePointCaptured = 0;
-    private readonly int totalKeys = 2;
+    private readonly int totalKeys = 5;
     private readonly int totalCirclePoint = 2;
     private bool cpHelper = true; // to prevent a condition in infinite loop
     private float courseTime = 0f;
-    public int GetKeysPicked() { return keysPicked; }
-    public int GetCirclePointCaptured() { return circlePointCaptured; }
-    public int GetTotalKeys() { return totalKeys; }
-    public int GetTotalCirclePoint() { return totalCirclePoint; }
-    public bool IsGameOver() { return isGameOver; }
-
-    public void SetIsCrateDone(bool isCrateDone) { this.isCrateDone = isCrateDone; }
-    public void SetGoldKeysPicked(int goldkey) {  keysPicked = goldkey; }
-    public void SetCirclePointCaptured(int circlepoint) { circlePointCaptured = circlepoint; }
-
     [SerializeField] private GameObject endingCP;
     [SerializeField] private GameObject progressUI;
     [SerializeField] private GameObject gameOverScreen;
@@ -35,13 +25,26 @@ public class GameState : MonoBehaviour
     private GameObject[] questCP;
     private Vector3 spawnpoint;
 
+    public bool GetIsCrateDone() {  return isCrateDone; }
+    public int GetKeysPicked() { return keysPicked; }
+    public int GetCirclePointCaptured() { return circlePointCaptured; }
+    public int GetTotalKeys() { return totalKeys; }
+    public int GetTotalCirclePoint() { return totalCirclePoint; }
+    public bool IsGameOver() { return isGameOver; }
     public GameObject GetProgressUI() { return progressUI; }
     public GameObject GetEndingCP() { return endingCP; }
+
+
+    public void SetIsCrateDone(bool isCrateDone) { this.isCrateDone = isCrateDone; }
+    public void SetGoldKeysPicked(int goldkey) {  keysPicked = goldkey; }
+    public void SetCirclePointCaptured(int circlepoint) { circlePointCaptured = circlepoint; }
 
     private void Awake()
     {
         GameStart();
     }
+
+    private bool isBossSpawned = false;
 
     private void Update()
     {
@@ -51,6 +54,13 @@ public class GameState : MonoBehaviour
 
         if (isCrateDone)
         {
+            if (!isBossSpawned)
+            {
+                Spawner.Instance.SpawnBoss();
+                isBossSpawned=true;
+            }
+
+            Spawner.Instance?.IncreaseDifficulty();
             EnableLastCirclePoint();
 
             if (EndingCirclePoint.Instance.GetIsGameOver())
@@ -61,7 +71,7 @@ public class GameState : MonoBehaviour
 
         }
 
-        if(totalKeys == keysPicked && cpHelper)
+        if(totalKeys == keysPicked && cpHelper && totalCirclePoint - 1 == circlePointCaptured)
         {
             EnableDisableCirclePoint(0, true);
             cpHelper = false;
@@ -109,7 +119,7 @@ public class GameState : MonoBehaviour
             for (int i = 0; i < zombies.Length; i++)
             {
                 zombies[i].GetComponent<NavMeshAgent>().enabled = false;
-                zombies[i].GetComponent<ZombieController>().enabled = false;
+                zombies[i].GetComponent<Zombie>().enabled = false;
                 zombies[i].GetComponentInChildren<Animator>().enabled = false;
             }
 
@@ -120,7 +130,7 @@ public class GameState : MonoBehaviour
         }
         else
         {
-            if (SemiEnding.Instance.GetIsDone())
+            if (MissionSuccess.Instance.GetIsDone())
             {
                 print("GAMOVERUI");
                 GameObject.FindGameObjectWithTag("Typewriter")?.SetActive(false);
